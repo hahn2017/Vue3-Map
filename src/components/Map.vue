@@ -169,6 +169,9 @@ function searchLocation() {
           }
         }
         const latLng = results[0].geometry.location
+        const lat = latLng.lat()
+        const lng = latLng.lng()
+
         if (!seen) {
           const place: Place = {
             id: results[0].place_id,
@@ -176,14 +179,12 @@ function searchLocation() {
           }
           place.marker = addMarker(latLng)
           places.push(place)
-          const lat = latLng.lat()
-          const lng = latLng.lng()
-
-          getTimeZoneInfo(lat, lng).then((timeZoneInfo) => {
-            latestLocation.value = timeZoneInfo
-          })
         }
+
         map.setCenter(latLng)
+        getTimeZoneInfo(lat, lng).then((timeZoneInfo) => {
+          latestLocation.value = timeZoneInfo
+        })
       }
     })
   }
