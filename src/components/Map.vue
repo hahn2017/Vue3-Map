@@ -162,21 +162,28 @@ function searchLocation() {
     const geocoder = new google.maps.Geocoder()
     geocoder.geocode({ address: searchQuery.value }, (results, status) => {
       if (status === 'OK' && results && results.length > 0) {
-        const place: Place = {
-          id: results[0].place_id,
-          name: results[0].formatted_address,
+        let seen = false
+        for (let place of places) {
+          if (place.id === results[0].place_id) {
+            seen = true
+          }
         }
         const latLng = results[0].geometry.location
-        place.marker = addMarker(latLng)
+        if (!seen) {
+          const place: Place = {
+            id: results[0].place_id,
+            name: results[0].formatted_address,
+          }
+          place.marker = addMarker(latLng)
+          places.push(place)
+          const lat = latLng.lat()
+          const lng = latLng.lng()
+
+          getTimeZoneInfo(lat, lng).then((timeZoneInfo) => {
+            latestLocation.value = timeZoneInfo
+          })
+        }
         map.setCenter(latLng)
-        places.push(place)
-
-        const lat = latLng.lat()
-        const lng = latLng.lng()
-
-        getTimeZoneInfo(lat, lng).then((timeZoneInfo) => {
-          latestLocation.value = timeZoneInfo
-        })
       }
     })
   }
